@@ -194,7 +194,7 @@ public abstract class AbstractGA<G extends Number, F> {
 			
 			if (this.adaptativeMutation)
 			{
-				if (fitness(bestChromosome) / this.avg < 1.03)
+				if (fitness(bestChromosome) / this.avg < 1.02)
 				{
 					// Tried to set to high value, but solutions were quite bad.
 					this.mutationRate *= 1.1;
@@ -204,7 +204,7 @@ public abstract class AbstractGA<G extends Number, F> {
 					this.mutationRate *= 0.9;
 				}
 				
-				System.out.println("Mutation rate: " + this.mutationRate);
+//				System.out.println("Mutation rate: " + this.mutationRate);
 			}
 		}
 
@@ -254,7 +254,7 @@ public abstract class AbstractGA<G extends Number, F> {
 		}
 		
 		dist.sort(null);
-		System.out.println("Fitness P0: " + dist.get(0) + " P10: "  + dist.get(dist.size() / 10) + " P25: "  + dist.get(dist.size() / 4)  + " P50: "  + dist.get(dist.size() / 2));
+//		System.out.println("Fitness P0: " + dist.get(0) + " P10: "  + dist.get(dist.size() / 10) + " P25: "  + dist.get(dist.size() / 4)  + " P50: "  + dist.get(dist.size() / 2));
 
 		return bestChromosome;
 	}
@@ -338,8 +338,22 @@ public abstract class AbstractGA<G extends Number, F> {
 			Chromosome parent1 = parents.get(i);
 			Chromosome parent2 = parents.get(i + 1);
 
-			int crosspoint1 = rng.nextInt(chromosomeSize + 1);
-			int crosspoint2 = crosspoint1 + rng.nextInt((chromosomeSize + 1) - crosspoint1);
+//			int crosspoint1 = rng.nextInt(chromosomeSize + 1);
+//			int crosspoint2 = crosspoint1 + rng.nextInt((chromosomeSize + 1) - crosspoint1);
+			
+			int crosspoint1;
+			int crosspoint2;
+			do {
+				crosspoint1 = rng.nextInt(chromosomeSize + 1);
+				crosspoint2 = rng.nextInt(chromosomeSize + 1);
+			} while (crosspoint1 == crosspoint2);
+
+			if (crosspoint1 > crosspoint2)
+			{
+				int tmp = crosspoint1;
+				crosspoint1 = crosspoint2;
+				crosspoint2 = tmp;
+			}
 
 			Chromosome offspring1 = new Chromosome();
 			Chromosome offspring2 = new Chromosome();
