@@ -77,6 +77,10 @@ public abstract class AbstractGA<G extends Number, F> {
 	 */
 	protected Chromosome bestChromosome;
 
+	private boolean adaptativeMutation;
+
+	private double avg;
+
 	/**
 	 * Creates a new solution which is empty, i.e., does not contain any
 	 * candidate solution element.
@@ -138,12 +142,13 @@ public abstract class AbstractGA<G extends Number, F> {
 	 * @param mutationRate
 	 *            The mutation rate.
 	 */
-	public AbstractGA(Evaluator<F> objFunction, Integer generations, Integer popSize, Double mutationRate) {
+	public AbstractGA(Evaluator<F> objFunction, Integer generations, Integer popSize, Double mutationRate, boolean adaptativeMutation) {
 		this.ObjFunction = objFunction;
 		this.generations = generations;
 		this.popSize = popSize;
 		this.chromosomeSize = this.ObjFunction.getDomainSize();
 		this.mutationRate = mutationRate;
+		this.adaptativeMutation = adaptativeMutation;
 	}
 
 	/**
@@ -185,7 +190,21 @@ public abstract class AbstractGA<G extends Number, F> {
 				if (verbose)
 					System.out.println("(Gen. " + g + ") BestSol = " + bestSol);
 			}
-
+			
+			if (this.adaptativeMutation)
+			{
+				if (fitness(bestChromosome) / this.avg < 1.03)
+				{
+					// Tried to set to high value, but solutions were quite bad.
+					this.mutationRate *= 1.1;
+				}
+				else
+				{
+					this.mutationRate *= 0.9;
+				}
+				
+				System.out.println("Mutation rate: " + this.mutationRate);
+			}
 		}
 
 		return bestSol;
@@ -220,6 +239,7 @@ public abstract class AbstractGA<G extends Number, F> {
 
 		ArrayList<Double> dist = new ArrayList<Double>();
 		double bestFitness = Double.NEGATIVE_INFINITY;
+		this.avg = 0.0;
 		Chromosome bestChromosome = null;
 		for (Chromosome c : population) {
 			double fitness = fitness(c);
@@ -228,6 +248,7 @@ public abstract class AbstractGA<G extends Number, F> {
 				bestChromosome = c;
 			}
 
+			this.avg += fitness / population.size();
 			dist.add(fitness);
 		}
 		

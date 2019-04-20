@@ -30,8 +30,8 @@ public class GA_QBFPT extends AbstractGA<Integer, Integer> {
 	 * @throws IOException
 	 *             Necessary for I/O operations.
 	 */
-	public GA_QBFPT(Integer generations, Integer popSize, Double mutationRate, String filename) throws IOException {
-		super(new QBFPT(filename), generations, popSize, mutationRate);
+	public GA_QBFPT(Integer generations, Integer popSize, Double mutationRate, String filename, boolean adaptativeMutation) throws IOException {
+		super(new QBFPT(filename), generations, popSize, mutationRate, adaptativeMutation);
 	}
 
 	/**
@@ -120,13 +120,12 @@ public class GA_QBFPT extends AbstractGA<Integer, Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GA_QBFPT ga = new GA_QBFPT(1000, 100, 1.0 / 1000.0, "GA_Framework/instances/qbf400");
+		GA_QBFPT ga = new GA_QBFPT(10, 100, 1.0 / 400.0, "GA_Framework/instances/qbf400", true);
 		Solution<Integer> bestSol = ga.solve();
 		System.out.println("maxVal = " + bestSol);
 		long endTime = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		System.out.println("Time = " + (double) totalTime / (double) 1000 + " seg");
-
 	}
 
 }
