@@ -1,8 +1,8 @@
-package problems.qbf.solvers;
+package problems.qbfpt.solvers;
 
 import java.io.IOException;
 import metaheuristics.ga.AbstractGA;
-import problems.qbf.QBF;
+import problems.qbfpt.QBFPT;
 import solutions.Solution;
 
 /**
@@ -12,7 +12,7 @@ import solutions.Solution;
  * 
  * @author ccavellucci, fusberti
  */
-public class GA_QBF extends AbstractGA<Integer, Integer> {
+public class GA_QBFPT extends AbstractGA<Integer, Integer> {
 
 	/**
 	 * Constructor for the GA_QBF class. The QBF objective function is passed as
@@ -30,8 +30,8 @@ public class GA_QBF extends AbstractGA<Integer, Integer> {
 	 * @throws IOException
 	 *             Necessary for I/O operations.
 	 */
-	public GA_QBF(Integer generations, Integer popSize, Double mutationRate, String filename) throws IOException {
-		super(new QBF(filename), generations, popSize, mutationRate);
+	public GA_QBFPT(Integer generations, Integer popSize, Double mutationRate, String filename) throws IOException {
+		super(new QBFPT(filename), generations, popSize, mutationRate);
 	}
 
 	/**
@@ -56,6 +56,8 @@ public class GA_QBF extends AbstractGA<Integer, Integer> {
 	 */
 	@Override
 	protected Solution<Integer> decode(Chromosome chromosome) {
+
+		ObjFunction.makeViable(chromosome);
 
 		Solution<Integer> solution = createEmptySol();
 		for (int locus = 0; locus < chromosome.size(); locus++) {
@@ -118,7 +120,7 @@ public class GA_QBF extends AbstractGA<Integer, Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GA_QBF ga = new GA_QBF(1000, 100, 1.0 / 1000.0, "GA_Framework/instances/qbf400");
+		GA_QBFPT ga = new GA_QBFPT(1000, 100, 1.0 / 1000.0, "GA_Framework/instances/qbf400");
 		Solution<Integer> bestSol = ga.solve();
 		System.out.println("maxVal = " + bestSol);
 		long endTime = System.currentTimeMillis();

@@ -1,5 +1,6 @@
 package problems;
 
+import metaheuristics.ga.AbstractGA;
 import solutions.Solution;
 
 /**
@@ -31,48 +32,5 @@ public interface Evaluator<E> {
 	 */
 	public abstract Double evaluate(Solution<E> sol);
 
-	/**
-	 * Evaluates the cost variation of inserting an element into a solution
-	 * according to an objective function.
-	 * 
-	 * @param elem
-	 *            the element under consideration for insertion.
-	 * @param sol
-	 *            the solution for which the element insertion is being
-	 *            evaluated.
-	 * @return the cost variation resulting from the element insertion into the
-	 *         solution.
-	 */
-	public abstract Double evaluateInsertionCost(E elem, Solution<E> sol);
-
-	/**
-	 * Evaluates the cost variation of removing an element into a solution
-	 * according to an objective function.
-	 * 
-	 * @param elem
-	 *            the element under consideration for removal.
-	 * @param sol
-	 *            the solution for which the element insertion is being
-	 *            evaluated.
-	 * @return the cost variation resulting from the element removal pf the the
-	 *         solution.
-	 */
-	public abstract Double evaluateRemovalCost(E elem, Solution<E> sol);
-
-	/**
-	 * Evaluates the cost variation of exchanging candidates, one being
-	 * considered to enter the solution (elemIn) and the other being considered
-	 * for removal (elemOut).
-	 * 
-	 * @param elemIn
-	 *            the element under consideration for insertion.
-	 * @param elemOut
-	 *            the element under consideration for removal.
-	 * @param sol
-	 *            the solution for which the elements exchange is being
-	 *            evaluated.
-	 * @return the cost variation resulting from the elements exchange.
-	 */
-	public abstract Double evaluateExchangeCost(E elemIn, E elemOut, Solution<E> sol);
-
+	public abstract void makeViable(AbstractGA<Integer, Integer>.Chromosome chromosome);
 }

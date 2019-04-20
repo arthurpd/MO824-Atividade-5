@@ -1,31 +1,22 @@
-package problems.qbf;
+package problems.qbfpt;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Random;
 
 import metaheuristics.ga.AbstractGA;
 import problems.Evaluator;
 import solutions.Solution;
 
-/**
- * A quadractic binary function (QBF) is a function that can be expressed as the
- * sum of quadractic terms: f(x) = \sum{i,j}{a_{ij}*x_i*x_j}. In matricial form
- * a QBF can be expressed as f(x) = x'.A.x 
- * The problem of minimizing a QBF is NP-hard [1], even when no constraints
- * are considered.
- * 
- * [1] Kochenberger, et al. The unconstrained binary quadratic programming
- * problem: a survey. J Comb Optim (2014) 28:58–81. DOI
- * 10.1007/s10878-014-9734-0.
- * 
- * @author ccavellucci, fusberti
- *
- */
-public class QBF implements Evaluator<Integer> {
+public class QBFPT implements Evaluator<Integer> {
+
+	public static final Random rng = new Random(0);
 
 	/**
 	 * Dimension of the domain.
@@ -38,9 +29,14 @@ public class QBF implements Evaluator<Integer> {
 	public final Double[] variables;
 
 	/**
-	 * The matrix A of coefficients for the QBF f(x) = x'.A.x
+	 * The matrix A of coefficients for the QBFPT f(x) = x'.A.x
 	 */
 	public Double[][] A;
+	
+	/**
+	 * The list T of prohibited tuples
+	 */
+	public Integer[][] prohibited_triples;
 
 	/**
 	 * The constructor for QuadracticBinaryFunction class. The filename of the
@@ -52,11 +48,52 @@ public class QBF implements Evaluator<Integer> {
 	 * @throws IOException
 	 *             Necessary for I/O operations.
 	 */
-	public QBF(String filename) throws IOException {
+	public QBFPT(String filename) throws IOException {
 		size = readInput(filename);
 		variables = allocateVariables();
+		prohibited_triples = mountProhibitedList();
 	}
 
+
+	public Integer[][] mountProhibitedList() {
+		Integer[][] triples = new Integer[size][3];
+		for (int i = 0; i < size; i++) {
+			triples[i][0] = i+1;
+
+			if (lFunction(i, 131, 1031) != i+1) {
+				triples[i][1] = lFunction(i, 131, 1031);
+			} else {
+				triples[i][1] = 1 + (lFunction(i, 131, 1031) % size);
+			}
+
+			Integer x = 1 + (lFunction(i, 193, 1093) % size);
+			if (lFunction(i, 193, 1093) != i+1 && lFunction(i, 193, 1093) != triples[i][1]) {
+				triples[i][2] = lFunction(i, 193, 1093);
+			} else if (x != i+1 && x != triples[i][1]) {
+				triples[i][2] = x;
+			} else {
+				triples[i][2] = 1 + ((lFunction(i, 193, 1093) + 1) % size);
+			}
+			Integer maxi = Math.max(triples[i][0], Math.max(triples[i][1], triples[i][2]));
+			Integer mini = Math.min(triples[i][0], Math.min(triples[i][1], triples[i][2]));
+			Integer middle = triples[i][0] + triples[i][1] + triples[i][2] - maxi - mini;
+			triples[i][0] = mini - 1;
+			triples[i][1] = middle - 1;
+			triples[i][2] = maxi - 1;
+		}
+		return triples;
+	}
+	
+	public void printProhibitedList() {
+		for (int i = 0; i < size; i++) {
+			System.out.println(prohibited_triples[i][0] + " " + prohibited_triples[i][1] + " " +  prohibited_triples[i][2]);
+		}
+	}
+
+	private Integer lFunction(Integer u, Integer pi_1, Integer pi_2) {
+		return 1 + ((pi_1 * u + pi_2) % size);
+	}
+		
 	/**
 	 * Evaluates the value of a solution by transforming it into a vector. This
 	 * is required to perform the matrix multiplication which defines a QBF.
@@ -98,6 +135,7 @@ public class QBF implements Evaluator<Integer> {
 	public Double evaluate(Solution<Integer> sol) {
 
 		setVariables(sol);
+		
 		return sol.cost = evaluateQBF();
 
 	}
@@ -122,10 +160,14 @@ public class QBF implements Evaluator<Integer> {
 			aux = (double) 0;
 		}
 
-		return sum;
+		for (int i = 0; i < prohibited_triples.length; i++) {
+			if (variables[prohibited_triples[i][0]] > 0.5 && variables[prohibited_triples[i][1]] > 0.5 && variables[prohibited_triples[i][2]] > 0.5)
+				sum -= 1e5;
+		}
 
+		return sum;
 	}
-	
+
 	/**
 	 * Responsible for setting the QBF function parameters by reading the
 	 * necessary input from an external file. this method reads the domain's
@@ -193,62 +235,16 @@ public class QBF implements Evaluator<Integer> {
 
 	}
 
-	/**
-	 * A main method for testing the QBF class.
-	 * 
-	 * @param args
-	 * @throws IOException
-	 */
-	public static void main(String[] args) throws IOException {
-
-		QBF qbf = new QBF("instances/qbf040");
-		qbf.printMatrix();
-		Double maxVal = Double.NEGATIVE_INFINITY;
-		
-//		System.out.println("maxVal = " + qbf.evaluateQBF());
-//		System.out.println("size = " + qbf.variables.length);
-//		System.exit(0);
-		
-
-		// evaluates randomly generated values for the domain, saving the best
-		// one.
-		for (int i = 0; i < 10000; i++) {
-			for (int j = 0; j < qbf.size; j++) {
-				if (Math.random() < 0.5)
-					qbf.variables[j] = 0.0;
-				else
-					qbf.variables[j] = 1.0;
-			}
-			System.out.println("x = " + Arrays.toString(qbf.variables));
-			Double eval = qbf.evaluateQBF();
-			System.out.println("f(x) = " + eval);
-			if (maxVal < eval)
-				maxVal = eval;
-		}
-		System.out.println("maxVal = " + maxVal);
-
-		// evaluates the zero array.
-		for (int j = 0; j < qbf.size; j++) {
-			qbf.variables[j] = 0.0;
-		}
-		System.out.println("x = " + Arrays.toString(qbf.variables));
-		System.out.println("f(x) = " + qbf.evaluateQBF());
-
-		// evaluates the all-ones array.
-		for (int j = 0; j < qbf.size; j++) {
-			qbf.variables[j] = 1.0;
-		}
-		System.out.println("x = " + Arrays.toString(qbf.variables));
-		System.out.println("f(x) = " + qbf.evaluateQBF());
-		
-		
-
-	}
 
 	@Override
 	public void makeViable(AbstractGA<Integer, Integer>.Chromosome chromosome) {
-		// TODO Auto-generated method stub
-		
-	}
 
+		for (int i = 0; i < prohibited_triples.length; i++) {
+			if (chromosome.get(prohibited_triples[i][0]) > 0.5 && chromosome.get(prohibited_triples[i][1]) > 0.5 && chromosome.get(prohibited_triples[i][2]) > 0.5)
+			{
+				chromosome.set(prohibited_triples[i][rng.nextInt(3)], 0);
+			}
+		}
+
+	}
 }

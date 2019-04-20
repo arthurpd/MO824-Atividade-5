@@ -218,6 +218,7 @@ public abstract class AbstractGA<G extends Number, F> {
 	 */
 	protected Chromosome getBestChromosome(Population population) {
 
+		ArrayList<Double> dist = new ArrayList<Double>();
 		double bestFitness = Double.NEGATIVE_INFINITY;
 		Chromosome bestChromosome = null;
 		for (Chromosome c : population) {
@@ -226,7 +227,12 @@ public abstract class AbstractGA<G extends Number, F> {
 				bestFitness = fitness;
 				bestChromosome = c;
 			}
+
+			dist.add(fitness);
 		}
+		
+		dist.sort(null);
+		System.out.println("Fitness P0: " + dist.get(0) + " P10: "  + dist.get(dist.size() / 10) + " P25: "  + dist.get(dist.size() / 4)  + " P50: "  + dist.get(dist.size() / 2));
 
 		return bestChromosome;
 	}
