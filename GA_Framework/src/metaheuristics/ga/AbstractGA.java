@@ -20,6 +20,7 @@ public abstract class AbstractGA<G extends Number, F> {
 
 	@SuppressWarnings("serial")
 	public class Chromosome extends ArrayList<G> {
+		public Double fitness = null;
 	}
 
 	@SuppressWarnings("serial")

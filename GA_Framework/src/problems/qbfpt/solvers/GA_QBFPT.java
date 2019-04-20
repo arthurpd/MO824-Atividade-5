@@ -95,8 +95,12 @@ public class GA_QBFPT extends AbstractGA<Integer, Integer> {
 	@Override
 	protected Double fitness(Chromosome chromosome) {
 
-		return decode(chromosome).cost;
-
+		if (chromosome.fitness == null)
+		{
+			chromosome.fitness = decode(chromosome).cost;
+		}
+		
+		return chromosome.fitness;
 	}
 
 	/*
@@ -110,7 +114,7 @@ public class GA_QBFPT extends AbstractGA<Integer, Integer> {
 	protected void mutateGene(Chromosome chromosome, Integer locus) {
 
 		chromosome.set(locus, 1 - chromosome.get(locus));
-
+		chromosome.fitness = null;
 	}
 
 	/**
@@ -120,7 +124,7 @@ public class GA_QBFPT extends AbstractGA<Integer, Integer> {
 	public static void main(String[] args) throws IOException {
 
 		long startTime = System.currentTimeMillis();
-		GA_QBFPT ga = new GA_QBFPT(10, 100, 1.0 / 400.0, "GA_Framework/instances/qbf400", true);
+		GA_QBFPT ga = new GA_QBFPT(1000, 100, 1.0 / 400.0, "GA_Framework/instances/qbf400", true);
 		Solution<Integer> bestSol = ga.solve();
 		System.out.println("maxVal = " + bestSol);
 		long endTime = System.currentTimeMillis();
