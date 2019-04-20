@@ -31,7 +31,7 @@ public class GA_QBF extends AbstractGA<Integer, Integer> {
 	 *             Necessary for I/O operations.
 	 */
 	public GA_QBF(Integer generations, Integer popSize, Double mutationRate, String filename) throws IOException {
-		super(new QBF(filename), generations, popSize, mutationRate, false);
+		super(new QBF(filename), generations, popSize, mutationRate, false, false, false);
 	}
 
 	/**
