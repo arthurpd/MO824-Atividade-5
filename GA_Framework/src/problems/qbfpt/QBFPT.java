@@ -152,12 +152,16 @@ public class QBFPT implements Evaluator<Integer> {
 		Double vecAux[] = new Double[size];
 
 		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				aux += variables[j] * A[i][j];
+			if (variables[i] > 0.5)
+			{
+				for (int j = 0; j < size; j++) {
+					aux += variables[j] * A[i][j];
+				}
+
+				vecAux[i] = aux;
+				sum += aux * variables[i];
+				aux = (double) 0;				
 			}
-			vecAux[i] = aux;
-			sum += aux * variables[i];
-			aux = (double) 0;
 		}
 
 		for (int i = 0; i < prohibited_triples.length; i++) {
