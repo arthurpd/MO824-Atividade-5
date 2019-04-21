@@ -1,6 +1,7 @@
 package metaheuristics.ga;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import problems.Evaluator;
@@ -347,6 +348,8 @@ public abstract class AbstractGA<G extends Number, F> {
 
 				pos += sum / popSize;
 			}
+			
+			Collections.shuffle(parents, rng);
 		}
 
 		return parents;
